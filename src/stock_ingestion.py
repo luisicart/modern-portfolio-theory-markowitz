@@ -3,11 +3,21 @@ import pandas as pd
 import yfinance as yf
 
 #%%
-tickers_path = '../portfolio_products.txt'
-tickers = []
+tickers_path = './portfolio_products.txt'
 
-with open(tickers_path, 'r') as file:
-    tickers = file.read().splitlines()
+with open(tickers_path, 'r') as f:
+    lines = [l.strip() for l in f.readlines()]
+
+sections = {}
+current = None
+for line in lines:
+    if line.startswith('[') and line.endswith(']'):
+        current = line[1:-1]
+        sections[current] = []
+    elif line and current:
+        sections[current].append(line)
+
+tickers = sections.get('STOCKS', [])
 
 print(tickers)
 #%%
@@ -15,7 +25,7 @@ df_prices = yf.download(
     tickers = tickers,
     auto_adjust = False,
     progress = False,
-    period='6mo',
+    period='2y',
     rounding=True
 )["Close"]
 
